@@ -97,7 +97,13 @@ class CanvasViewController: UIViewController {
                 self.updated(snapshot: snapshot, at: index)
         }
         
-        cancellables.append(contentsOf: [thumbnailUpdated, layerUpdated])
+        let thumbnailReordered = model.thumbnailReordered
+            .receive(on: RunLoop.main)
+            .sink { origin, destination in
+                self.thumbnailViewController.reorderItem(at: origin, to: destination)
+        }
+        
+        cancellables.append(contentsOf: [thumbnailUpdated, layerUpdated, thumbnailReordered])
     }
     
     private func created(snapshot: Model.LayerSnapshot, at index: Int) {
@@ -139,8 +145,11 @@ class CanvasViewController: UIViewController {
         let thumbnailAddButtonTapped = thumbnailViewController.thumbnailAddButtonTapped.sink { index in
             self.model.createLayer()
         }
+        let thumbnailReordered = thumbnailViewController.thumbnailReordered.sink { origin, destination in
+            self.model.reorderItem(at: origin, to: destination)
+        }
         
-        cancellables.append(contentsOf: [thumbnailIndexTapped, thumbnailAddButtonTapped])
+        cancellables.append(contentsOf: [thumbnailIndexTapped, thumbnailAddButtonTapped, thumbnailReordered])
     }
     
 }

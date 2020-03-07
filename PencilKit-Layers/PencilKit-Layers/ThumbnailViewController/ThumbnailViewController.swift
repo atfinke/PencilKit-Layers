@@ -23,6 +23,7 @@ class ThumbnailViewController: UICollectionViewController {
     private var needsToDeselectInitalLayer = true
     
     let thumbnailIndexTapped = PassthroughSubject<Int, Never>()
+    let thumbnailReordered = PassthroughSubject<(origin: Int, destination: Int), Never>()
     let thumbnailAddButtonTapped = PassthroughSubject<Bool, Never>()
     
     // MARK: - View Life Cycle -
@@ -40,6 +41,9 @@ class ThumbnailViewController: UICollectionViewController {
         collectionView?.register(ThumbnailAddButtonFooter.self,
                                  forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter,
                                  withReuseIdentifier: ThumbnailAddButtonFooter.reuseIdentifier)
+        
+        collectionView.dragDelegate = self
+        collectionView.dropDelegate = self
     }
     
     func add(thumbnail: UIImage, at index: Int) {
@@ -64,6 +68,21 @@ class ThumbnailViewController: UICollectionViewController {
             self.collectionView.reloadItems(at: [indexPath])
             if isSelected ?? false {
                 collectionView.selectItem(at: indexPath, animated: false, scrollPosition: .centeredVertically)
+            }
+        }
+    }
+    
+    func reorderItem(at origin: Int, to destination: Int) {
+        let image = thumbnails.remove(at: origin)
+        thumbnails.insert(image, at: destination)
+        let originIndexPath = IndexPath(row: origin, section: 0)
+        let destinationIndexPath = IndexPath(row: destination, section: 0)
+        let isSelected = collectionView.indexPathsForSelectedItems?.contains(originIndexPath)
+        
+        UIView.performWithoutAnimation {
+            self.collectionView.moveItem(at: originIndexPath, to: destinationIndexPath)
+            if isSelected ?? false {
+                collectionView.selectItem(at: destinationIndexPath, animated: false, scrollPosition: .centeredVertically)
             }
         }
     }

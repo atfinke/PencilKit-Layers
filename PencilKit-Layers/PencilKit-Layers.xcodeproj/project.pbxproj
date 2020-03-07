@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		14012BB12414304600DE0D05 /* ThumbnailViewController+DND.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14012BB02414304600DE0D05 /* ThumbnailViewController+DND.swift */; };
 		14344133241403BD0036D9AA /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14344132241403BD0036D9AA /* AppDelegate.swift */; };
 		14344135241403BD0036D9AA /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14344134241403BD0036D9AA /* SceneDelegate.swift */; };
 		14344137241403BD0036D9AA /* CanvasViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14344136241403BD0036D9AA /* CanvasViewController.swift */; };
@@ -22,6 +23,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		14012BB02414304600DE0D05 /* ThumbnailViewController+DND.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ThumbnailViewController+DND.swift"; sourceTree = "<group>"; };
 		1434412F241403BD0036D9AA /* PencilKit-Layers.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "PencilKit-Layers.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		14344132241403BD0036D9AA /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		14344134241403BD0036D9AA /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -82,6 +84,7 @@
 			isa = PBXGroup;
 			children = (
 				1434414E241417910036D9AA /* ThumbnailViewController.swift */,
+				14012BB02414304600DE0D05 /* ThumbnailViewController+DND.swift */,
 				1434415424141ACF0036D9AA /* ThumbnailCollectionViewCell.swift */,
 				143441562414223E0036D9AA /* ThumbnailAddButtonFooter.swift */,
 			);
@@ -179,6 +182,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				14012BB12414304600DE0D05 /* ThumbnailViewController+DND.swift in Sources */,
 				1434414F241417910036D9AA /* ThumbnailViewController.swift in Sources */,
 				1434414D241411F00036D9AA /* OSLog+PencilKit-Layers.swift in Sources */,
 				1434415524141ACF0036D9AA /* ThumbnailCollectionViewCell.swift in Sources */,

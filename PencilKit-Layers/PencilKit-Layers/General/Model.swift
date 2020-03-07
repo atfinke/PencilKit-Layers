@@ -50,6 +50,9 @@ class Model {
     let thumbnailUpdated = PassthroughSubject<(index: Int, thumbnail: UIImage), Never>()
     let layerUpdated = PassthroughSubject<(index: Int, snapshot: LayerSnapshot), Never>()
     
+    let thumbnailReordered = PassthroughSubject<(origin: Int, destination: Int), Never>()
+    let layerReordered = PassthroughSubject<(origin: Int, destination: Int), Never>()
+    
     // MARK: - Layer State -
     
     func createLayer() {
@@ -70,6 +73,24 @@ class Model {
     func selectLayer(at index: Int) {
         generateLayerSnapshot()
         activeDrawingIndex = index
+    }
+    
+    func reorderItem(at origin: Int, to destination: Int) {
+        let isActive = origin == activeDrawingIndex
+        let drawing = drawings.remove(at: origin)
+        let thumbnail = drawingThumbnailSnapshots.remove(at: origin)
+        let layer = drawingLayerSnapshots.remove(at: origin)
+        
+        drawings.insert(drawing, at: destination)
+        drawingThumbnailSnapshots.insert(thumbnail, at: destination)
+        drawingLayerSnapshots.insert(layer, at: destination)
+        
+        thumbnailReordered.send((origin, destination))
+        layerReordered.send((origin, destination))
+        
+        if isActive {
+            activeDrawingIndex = destination
+        }
     }
     
     func updated(drawing: PKDrawing) {
@@ -109,11 +130,10 @@ class Model {
         let drawingIndex = activeDrawingIndex
         
         let thumbnailCaptureSize = UIScreen.main.bounds
-        let scale = Design.thumbnailWidth / thumbnailCaptureSize.width
         
         canvasViewLayerRenderer.async {
             let bounds = drawing.bounds
-            let image =  drawing.image(from: bounds, scale: scale)
+            let image =  drawing.image(from: bounds, scale: UIScreen.main.scale)
             let snapshot = LayerSnapshot(bounds: bounds, image: image)
             
             os_log("%{public}s: size: %{public}s, scale: %{public}.2f", log: .model, type: .info, #function, thumbnailCaptureSize.debugDescription, scale)
