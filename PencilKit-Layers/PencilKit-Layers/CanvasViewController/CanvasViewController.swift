@@ -37,6 +37,7 @@ class CanvasViewController: UIViewController {
                                            left: 0,
                                            bottom: Design.thumbnailHeightPadding / 2,
                                            right: 0)
+        
         let controller = ThumbnailViewController(collectionViewLayout: layout)
         controller.collectionView.backgroundColor = .secondarySystemBackground
         return controller
@@ -48,27 +49,21 @@ class CanvasViewController: UIViewController {
         super.viewDidLoad()
         
         title = "Canvas"
-        
-        canvasView.frame = view.bounds
-        canvasView.delegate = self
-        view.addSubview(canvasView)
-        
-        addChild(thumbnailViewController)
-        thumbnailViewController.view.frame = CGRect(x: 0,
-                                                    y: 0,
-                                                    width: Design.thumbnailWidthPadding + Design.thumbnailWidth,
-                                                    height: view.bounds.height)
-        view.addSubview(thumbnailViewController.view)
-        thumbnailViewController.didMove(toParent: self)
+        configureCanvasView()
+        configureThumbnailViewController()
         
         configureModelSubscribers()
-        model.createLayer(at: 0)
-        
+        model.createLayer()
+        canvasView.drawing = model.activeDrawing
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         configureToolPicker()
+    }
+    
+    override var prefersHomeIndicatorAutoHidden: Bool {
+        return true
     }
     
     // MARK: - Model Listeners -
@@ -102,7 +97,7 @@ class CanvasViewController: UIViewController {
                 self.updated(snapshot: snapshot, at: index)
         }
         
-        cancellables = [thumbnailUpdated, layerUpdated]
+        cancellables.append(contentsOf: [thumbnailUpdated, layerUpdated])
     }
     
     private func created(snapshot: Model.LayerSnapshot, at index: Int) {
@@ -124,6 +119,28 @@ class CanvasViewController: UIViewController {
     private func updated(thumbnail: UIImage, at index: Int) {
         os_log("%{public}s: index: %{public}d", log: .controller, type: .info, #function, index)
         thumbnailViewController.update(thumbnail: thumbnail, at: index)
+    }
+    
+    // MARK: - Other -
+    
+    func configureThumbnailViewController() {
+        addChild(thumbnailViewController)
+        thumbnailViewController.view.frame = CGRect(x: 0,
+                                                    y: 0,
+                                                    width: Design.thumbnailWidthPadding + Design.thumbnailWidth,
+                                                    height: view.bounds.height)
+        view.addSubview(thumbnailViewController.view)
+        thumbnailViewController.didMove(toParent: self)
+        
+        let thumbnailIndexTapped = thumbnailViewController.thumbnailIndexTapped.sink { index in
+            self.model.selectLayer(at: index)
+            self.canvasView.drawing = self.model.activeDrawing
+        }
+        let thumbnailAddButtonTapped = thumbnailViewController.thumbnailAddButtonTapped.sink { index in
+            self.model.createLayer()
+        }
+        
+        cancellables.append(contentsOf: [thumbnailIndexTapped, thumbnailAddButtonTapped])
     }
     
 }

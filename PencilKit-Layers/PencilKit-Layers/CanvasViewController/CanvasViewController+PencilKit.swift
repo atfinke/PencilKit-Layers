@@ -12,6 +12,14 @@ import os.log
 
 extension CanvasViewController: PKCanvasViewDelegate {
     
+    // MARK: - Interface Configuration -
+    
+    func configureCanvasView() {
+        canvasView.frame = view.bounds
+        canvasView.delegate = self
+        view.addSubview(canvasView)
+    }
+    
     func configureToolPicker() {
         guard let window = view.window,
             let toolPicker = PKToolPicker.shared(for: window) else {
@@ -26,7 +34,7 @@ extension CanvasViewController: PKCanvasViewDelegate {
     
     func canvasViewDrawingDidChange(_ canvasView: PKCanvasView) {
         os_log("%{public}s: called", log: .controller, type: .info, #function)
-        model.generateThumbnailSnapshot()
+        model.updated(drawing: canvasView.drawing)
     }
 }
 

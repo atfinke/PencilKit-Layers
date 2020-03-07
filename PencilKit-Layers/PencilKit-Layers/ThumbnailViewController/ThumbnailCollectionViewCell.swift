@@ -12,7 +12,7 @@ class ThumbnailCollectionViewCell: UICollectionViewCell {
     
     // MARK: - Properties -
     
-    static let reuseIdentifier = "Cell"
+    static let reuseIdentifier = "ThumbnailCollectionViewCell"
     
     let imageView: UIImageView = {
         let view = UIImageView()
@@ -21,11 +21,19 @@ class ThumbnailCollectionViewCell: UICollectionViewCell {
         return view
     }()
     
+    override var isSelected: Bool {
+        didSet {
+            setNeedsLayout()
+            layoutIfNeeded()
+        }
+    }
+    
     // MARK: - Initalization -
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         addSubview(imageView)
+        layer.borderColor = UIColor.clear.cgColor
     }
     
     required init?(coder: NSCoder) {
@@ -36,12 +44,14 @@ class ThumbnailCollectionViewCell: UICollectionViewCell {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        imageView.frame = bounds
         
-        layer.borderColor = tintColor.cgColor
-        layer.borderWidth = 4
+        let borderWidth: CGFloat = 4
+        layer.borderWidth = borderWidth
         layer.cornerRadius = 4
         layer.cornerCurve = .continuous
+        layer.borderColor = (isSelected ? tintColor : .clear)?.cgColor
+        
+        imageView.frame = bounds.insetBy(dx: borderWidth, dy: borderWidth)
     }
 }
 

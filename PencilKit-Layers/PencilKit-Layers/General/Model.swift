@@ -52,28 +52,35 @@ class Model {
     
     // MARK: - Layer State -
     
-    func createLayer(at index: Int) {
-        os_log("%{public}s: index: %{public}d", log: .model, type: .info, #function, index)
+    func createLayer() {
+        os_log("%{public}s: index: %{public}d", log: .model, type: .info, #function)
         
-        if index <= drawings.count {
-            let thumbnail = UIImage()
-            let layer = LayerSnapshot(bounds: .zero, image: thumbnail)
-            
-            drawings.insert(PKDrawing(), at: index)
-            drawingThumbnailSnapshots.insert(thumbnail, at: index)
-            drawingLayerSnapshots.insert(layer, at: index)
+        let thumbnail = UIImage()
+        let layer = LayerSnapshot(bounds: .zero, image: thumbnail)
+        
+        let index = drawings.count
+        drawings.insert(PKDrawing(), at: index)
+        drawingThumbnailSnapshots.insert(thumbnail, at: index)
+        drawingLayerSnapshots.insert(layer, at: index)
 
-            thumbnailCreated.send((index, thumbnail))
-            layerCreated.send((index, layer))
-        } else {
-            fatalError("Invalid index \(index), only have \(drawings.count) layers")
-        }
+        thumbnailCreated.send((index, thumbnail))
+        layerCreated.send((index, layer))
     }
     
+    func selectLayer(at index: Int) {
+        generateLayerSnapshot()
+        activeDrawingIndex = index
+    }
+    
+    func updated(drawing: PKDrawing) {
+        os_log("%{public}s: called", log: .model, type: .info, #function)
+        drawings[activeDrawingIndex] = drawing
+        generateThumbnailSnapshot()
+    }
     
     // MARK: - Image Generation -
     
-    func generateThumbnailSnapshot() {
+    private func generateThumbnailSnapshot() {
         os_log("%{public}s: called", log: .model, type: .info, #function)
         assert(Thread.isMainThread)
         
@@ -93,7 +100,7 @@ class Model {
         }
     }
     
-    func generateLayerSnapshot() {
+    private func generateLayerSnapshot() {
         os_log("%{public}s: called", log: .model, type: .info, #function)
         
         assert(Thread.isMainThread)

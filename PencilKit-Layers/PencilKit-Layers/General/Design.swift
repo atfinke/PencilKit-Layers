@@ -20,4 +20,10 @@ struct Design {
     }()
     static var thumbnailWidthPadding: CGFloat = 35
     static var thumbnailHeightPadding: CGFloat = 35
+    
+    static let thumbnailAddButtonSize = CGSize(width: 50, height: 50)
+    static let thumbnailAddButtonScaleFactor: CGFloat = 0.8
+    static let thumbnailAddButtonScaleDuration = 0.4
+    static let thumbnailAddButtonScaleDamping: CGFloat = 0.75
+    static let thumbnailAddButtonScaleVelocity: CGFloat = 0.75
 }

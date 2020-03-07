@@ -18,6 +18,7 @@
 		1434414D241411F00036D9AA /* OSLog+PencilKit-Layers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1434414C241411F00036D9AA /* OSLog+PencilKit-Layers.swift */; };
 		1434414F241417910036D9AA /* ThumbnailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1434414E241417910036D9AA /* ThumbnailViewController.swift */; };
 		1434415524141ACF0036D9AA /* ThumbnailCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1434415424141ACF0036D9AA /* ThumbnailCollectionViewCell.swift */; };
+		143441572414223E0036D9AA /* ThumbnailAddButtonFooter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 143441562414223E0036D9AA /* ThumbnailAddButtonFooter.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -34,6 +35,7 @@
 		1434414C241411F00036D9AA /* OSLog+PencilKit-Layers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "OSLog+PencilKit-Layers.swift"; sourceTree = "<group>"; };
 		1434414E241417910036D9AA /* ThumbnailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThumbnailViewController.swift; sourceTree = "<group>"; };
 		1434415424141ACF0036D9AA /* ThumbnailCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThumbnailCollectionViewCell.swift; sourceTree = "<group>"; };
+		143441562414223E0036D9AA /* ThumbnailAddButtonFooter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThumbnailAddButtonFooter.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -66,20 +68,45 @@
 		14344131241403BD0036D9AA /* PencilKit-Layers */ = {
 			isa = PBXGroup;
 			children = (
-				14344132241403BD0036D9AA /* AppDelegate.swift */,
-				14344134241403BD0036D9AA /* SceneDelegate.swift */,
-				14344136241403BD0036D9AA /* CanvasViewController.swift */,
-				1434414A241410E60036D9AA /* CanvasViewController+PencilKit.swift */,
-				14344148241409580036D9AA /* Model.swift */,
-				1434414E241417910036D9AA /* ThumbnailViewController.swift */,
-				1434415424141ACF0036D9AA /* ThumbnailCollectionViewCell.swift */,
-				14344146241409200036D9AA /* Design.swift */,
-				1434414C241411F00036D9AA /* OSLog+PencilKit-Layers.swift */,
+				1434415A241426C00036D9AA /* General */,
+				14344159241426BA0036D9AA /* CanvasViewController */,
+				14344158241426B30036D9AA /* ThumbnailViewController */,
 				1434413B241403BE0036D9AA /* Assets.xcassets */,
 				1434413D241403BE0036D9AA /* LaunchScreen.storyboard */,
 				14344140241403BE0036D9AA /* Info.plist */,
 			);
 			path = "PencilKit-Layers";
+			sourceTree = "<group>";
+		};
+		14344158241426B30036D9AA /* ThumbnailViewController */ = {
+			isa = PBXGroup;
+			children = (
+				1434414E241417910036D9AA /* ThumbnailViewController.swift */,
+				1434415424141ACF0036D9AA /* ThumbnailCollectionViewCell.swift */,
+				143441562414223E0036D9AA /* ThumbnailAddButtonFooter.swift */,
+			);
+			path = ThumbnailViewController;
+			sourceTree = "<group>";
+		};
+		14344159241426BA0036D9AA /* CanvasViewController */ = {
+			isa = PBXGroup;
+			children = (
+				14344136241403BD0036D9AA /* CanvasViewController.swift */,
+				1434414A241410E60036D9AA /* CanvasViewController+PencilKit.swift */,
+			);
+			path = CanvasViewController;
+			sourceTree = "<group>";
+		};
+		1434415A241426C00036D9AA /* General */ = {
+			isa = PBXGroup;
+			children = (
+				14344132241403BD0036D9AA /* AppDelegate.swift */,
+				14344134241403BD0036D9AA /* SceneDelegate.swift */,
+				14344148241409580036D9AA /* Model.swift */,
+				14344146241409200036D9AA /* Design.swift */,
+				1434414C241411F00036D9AA /* OSLog+PencilKit-Layers.swift */,
+			);
+			path = General;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -161,6 +188,7 @@
 				14344147241409200036D9AA /* Design.swift in Sources */,
 				14344133241403BD0036D9AA /* AppDelegate.swift in Sources */,
 				14344135241403BD0036D9AA /* SceneDelegate.swift in Sources */,
+				143441572414223E0036D9AA /* ThumbnailAddButtonFooter.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

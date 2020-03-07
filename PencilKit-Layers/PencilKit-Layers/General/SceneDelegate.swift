@@ -22,7 +22,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let canvasController = CanvasViewController()
         let navigationController = UINavigationController(rootViewController: canvasController)
         
-        
         let window = UIWindow(windowScene: windowScene)
         window.backgroundColor = .systemBackground
         window.rootViewController = navigationController
