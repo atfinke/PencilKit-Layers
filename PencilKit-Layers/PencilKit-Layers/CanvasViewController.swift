@@ -6,6 +6,7 @@
 //  Copyright © 2020 Andrew Finke. All rights reserved.
 //
 
+import Combine
 import UIKit
 import PencilKit
 
@@ -24,6 +25,9 @@ class CanvasViewController: UIViewController {
     }()
     
     var layers = [UIImageView]()
+    var cancellables = [AnyCancellable]()
+    
+    let model = Model()
     
     // MARK: - View Life Cycle -
     
@@ -35,34 +39,22 @@ class CanvasViewController: UIViewController {
         canvasView.frame = view.bounds
         canvasView.delegate = self
         view.addSubview(canvasView)
+        
+        let thumbnailCreated = model.thumbnailCreated
+            .receive(on: RunLoop.main)
+            .sink { index, thumbnail in
+                print(thumbnail)
+        }
+        
+        cancellables.append(thumbnailCreated)
+        
+        model.createLayer(at: 0)
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        
-        guard let window = view.window,
-            let toolPicker = PKToolPicker.shared(for: window) else {
-                fatalError("Couldn't get window")
-        }
-        toolPicker.setVisible(true, forFirstResponder: canvasView)
-        toolPicker.addObserver(canvasView)
-        canvasView.becomeFirstResponder()
+        configureToolPicker()
     }
     
 }
 
-extension CanvasViewController: PKCanvasViewDelegate {
-    
-    func canvasViewDrawingDidChange(_ canvasView: PKCanvasView) {
-        print(canvasView.drawing.bounds)
-    }
-    
-    
-    func saveThumbnail() {
-        
-    }
-    
-    func saveLayer() {
-        
-    }
-}
