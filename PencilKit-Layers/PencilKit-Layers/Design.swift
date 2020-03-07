@@ -9,7 +9,7 @@
 import UIKit
 
 struct Design {
-    static let thumbnailWidth: CGFloat = 100.0
+    static let thumbnailWidth: CGFloat = 120.0
     static var thumbnailHeight: CGFloat = {
         let screenBounds = UIScreen.main.bounds
         let aspectRatio = screenBounds.width / screenBounds.height
@@ -18,4 +18,6 @@ struct Design {
     static var thumbnailSize: CGSize = {
         return CGSize(width: thumbnailWidth, height: thumbnailHeight)
     }()
+    static var thumbnailWidthPadding: CGFloat = 35
+    static var thumbnailHeightPadding: CGFloat = 35
 }

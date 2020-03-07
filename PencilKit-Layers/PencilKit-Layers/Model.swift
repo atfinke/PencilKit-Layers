@@ -62,7 +62,7 @@ class Model {
             drawings.insert(PKDrawing(), at: index)
             drawingThumbnailSnapshots.insert(thumbnail, at: index)
             drawingLayerSnapshots.insert(layer, at: index)
-            
+
             thumbnailCreated.send((index, thumbnail))
             layerCreated.send((index, layer))
         } else {
