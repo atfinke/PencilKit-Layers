@@ -89,6 +89,7 @@ class Model {
             os_log("%{public}s: size: %{public}s, scale: %{public}.2f", log: .model, type: .info, #function, thumbnailCaptureSize.debugDescription, scale)
             
             self.drawingThumbnailSnapshots[drawingIndex] = image
+            self.thumbnailUpdated.send((drawingIndex, image))
         }
     }
     
@@ -111,6 +112,7 @@ class Model {
             os_log("%{public}s: size: %{public}s, scale: %{public}.2f", log: .model, type: .info, #function, thumbnailCaptureSize.debugDescription, scale)
             
             self.drawingLayerSnapshots[drawingIndex] = snapshot
+            self.layerUpdated.send((drawingIndex, snapshot))
         }
     }
     

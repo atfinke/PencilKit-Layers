@@ -8,6 +8,7 @@
 
 import UIKit
 import PencilKit
+import os.log
 
 extension CanvasViewController: PKCanvasViewDelegate {
     
@@ -24,6 +25,7 @@ extension CanvasViewController: PKCanvasViewDelegate {
     // MARK: - PKCanvasViewDelegate -
     
     func canvasViewDrawingDidChange(_ canvasView: PKCanvasView) {
+        os_log("%{public}s: called", log: .controller, type: .info, #function)
         model.generateThumbnailSnapshot()
     }
 }

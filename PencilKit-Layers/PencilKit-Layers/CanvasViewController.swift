@@ -9,6 +9,7 @@
 import Combine
 import UIKit
 import PencilKit
+import os.log
 
 class CanvasViewController: UIViewController {
     
@@ -42,11 +43,20 @@ class CanvasViewController: UIViewController {
         
         let thumbnailCreated = model.thumbnailCreated
             .receive(on: RunLoop.main)
+            .map { input -> (index: Int, thumbnail: UIImage) in
+                self.createdLayer(at: input.index)
+                return input
+        }
+  
+        let thumbnailUpdated = model.thumbnailUpdated
+            .receive(on: RunLoop.main)
+            .merge(with: thumbnailCreated)
             .sink { index, thumbnail in
                 print(thumbnail)
+                print("updated")
         }
         
-        cancellables.append(thumbnailCreated)
+        cancellables.append(thumbnailUpdated)
         
         model.createLayer(at: 0)
     }
@@ -54,6 +64,10 @@ class CanvasViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         configureToolPicker()
+    }
+    
+    private func createdLayer(at index: Int) {
+        os_log("%{public}s: index: %{public}d", log: .controller, type: .info, #function, index)
     }
     
 }

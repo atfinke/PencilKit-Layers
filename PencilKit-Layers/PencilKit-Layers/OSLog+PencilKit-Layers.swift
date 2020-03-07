@@ -10,17 +10,20 @@ import Foundation
 import os.log
 
 extension OSLog {
-
+    
     // MARK: - Types -
-
+    
     private enum CustomCategory: String {
-        case model
+        case model, controller
     }
-
+    
+    // MARK: - Properties -
+    
     private static let subsystem: String = {
         guard let identifier = Bundle.main.bundleIdentifier else { fatalError() }
         return identifier
     }()
-
+    
     static let model = OSLog(subsystem: subsystem, category: CustomCategory.model.rawValue)
+    static let controller = OSLog(subsystem: subsystem, category: CustomCategory.controller.rawValue)
 }
