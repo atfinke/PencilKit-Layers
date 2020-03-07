@@ -49,13 +49,15 @@ class CanvasViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        title = "Canvas"
+        title = "PencilKit Layers Exploration"
         configureCanvasView()
         configureThumbnailViewController()
         
         configureModelSubscribers()
         model.createLayer()
         canvasView.drawing = model.activeDrawing
+        
+        configureNavigationItem()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -155,10 +157,9 @@ class CanvasViewController: UIViewController {
     
     func configureThumbnailViewController() {
         addChild(thumbnailViewController)
-        thumbnailViewController.view.frame = CGRect(x: 0,
-                                                    y: 0,
-                                                    width: Design.thumbnailWidthPadding + Design.thumbnailWidth,
-                                                    height: view.bounds.height)
+        UIView.performWithoutAnimation {
+            self.toggleSidebar()
+        }
         view.addSubview(thumbnailViewController.view)
         thumbnailViewController.didMove(toParent: self)
         

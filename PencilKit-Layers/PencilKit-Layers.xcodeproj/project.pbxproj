@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		14012BB12414304600DE0D05 /* ThumbnailViewController+DND.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14012BB02414304600DE0D05 /* ThumbnailViewController+DND.swift */; };
+		14012BB32414415A00DE0D05 /* CanvasViewController+Buttons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14012BB22414415A00DE0D05 /* CanvasViewController+Buttons.swift */; };
 		14344133241403BD0036D9AA /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14344132241403BD0036D9AA /* AppDelegate.swift */; };
 		14344135241403BD0036D9AA /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14344134241403BD0036D9AA /* SceneDelegate.swift */; };
 		14344137241403BD0036D9AA /* CanvasViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14344136241403BD0036D9AA /* CanvasViewController.swift */; };
@@ -24,6 +25,7 @@
 
 /* Begin PBXFileReference section */
 		14012BB02414304600DE0D05 /* ThumbnailViewController+DND.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ThumbnailViewController+DND.swift"; sourceTree = "<group>"; };
+		14012BB22414415A00DE0D05 /* CanvasViewController+Buttons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CanvasViewController+Buttons.swift"; sourceTree = "<group>"; };
 		1434412F241403BD0036D9AA /* PencilKit-Layers.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "PencilKit-Layers.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		14344132241403BD0036D9AA /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		14344134241403BD0036D9AA /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -96,6 +98,7 @@
 			children = (
 				14344136241403BD0036D9AA /* CanvasViewController.swift */,
 				1434414A241410E60036D9AA /* CanvasViewController+PencilKit.swift */,
+				14012BB22414415A00DE0D05 /* CanvasViewController+Buttons.swift */,
 			);
 			path = CanvasViewController;
 			sourceTree = "<group>";
@@ -184,6 +187,7 @@
 			files = (
 				14012BB12414304600DE0D05 /* ThumbnailViewController+DND.swift in Sources */,
 				1434414F241417910036D9AA /* ThumbnailViewController.swift in Sources */,
+				14012BB32414415A00DE0D05 /* CanvasViewController+Buttons.swift in Sources */,
 				1434414D241411F00036D9AA /* OSLog+PencilKit-Layers.swift in Sources */,
 				1434415524141ACF0036D9AA /* ThumbnailCollectionViewCell.swift in Sources */,
 				1434414B241410E60036D9AA /* CanvasViewController+PencilKit.swift in Sources */,
