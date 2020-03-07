@@ -1,5 +1,5 @@
 //
-//  ViewController.swift
+//  CanvasViewController.swift
 //  PencilKit-Layers
 //
 //  Created by Andrew Finke on 3/7/20.
@@ -8,7 +8,7 @@
 
 import UIKit
 
-class ViewController: UIViewController {
+class CanvasViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
