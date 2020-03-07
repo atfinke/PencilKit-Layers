@@ -1,5 +1,5 @@
 //
-//  ThumbnailAddButtonFooter.swift
+//  ThumbnailAddButtonView.swift
 //  PencilKit-Layers
 //
 //  Created by Andrew Finke on 3/7/20.
@@ -8,7 +8,7 @@
 
 import UIKit
 
-class ThumbnailAddButtonFooter: UICollectionReusableView {
+class ThumbnailAddButtonView: UICollectionReusableView {
     
     // MARK: - Properties -
     

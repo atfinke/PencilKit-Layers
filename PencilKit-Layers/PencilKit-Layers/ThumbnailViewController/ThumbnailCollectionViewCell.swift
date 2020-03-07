@@ -32,6 +32,7 @@ class ThumbnailCollectionViewCell: UICollectionViewCell {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+        clipsToBounds = true
         addSubview(imageView)
         layer.borderColor = UIColor.clear.cgColor
     }
@@ -45,9 +46,10 @@ class ThumbnailCollectionViewCell: UICollectionViewCell {
     override func layoutSubviews() {
         super.layoutSubviews()
         
+        
         let borderWidth: CGFloat = 4
         layer.borderWidth = borderWidth
-        layer.cornerRadius = 4
+        layer.cornerRadius = 6
         layer.cornerCurve = .continuous
         layer.borderColor = (isSelected ? tintColor : .clear)?.cgColor
         

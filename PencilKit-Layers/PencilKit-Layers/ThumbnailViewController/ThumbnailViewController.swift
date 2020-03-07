@@ -38,9 +38,9 @@ class ThumbnailViewController: UICollectionViewController {
 
         collectionView?.register(ThumbnailCollectionViewCell.self,
                                       forCellWithReuseIdentifier: ThumbnailCollectionViewCell.reuseIdentifier)
-        collectionView?.register(ThumbnailAddButtonFooter.self,
+        collectionView?.register(ThumbnailAddButtonView.self,
                                  forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter,
-                                 withReuseIdentifier: ThumbnailAddButtonFooter.reuseIdentifier)
+                                 withReuseIdentifier: ThumbnailAddButtonView.reuseIdentifier)
         
         collectionView.dragDelegate = self
         collectionView.dropDelegate = self
@@ -72,17 +72,18 @@ class ThumbnailViewController: UICollectionViewController {
         }
     }
     
-    func reorderItem(at origin: Int, to destination: Int) {
+    func reorderItem(at origin: Int, to destination: Int, isActive: Bool) {
         let image = thumbnails.remove(at: origin)
         thumbnails.insert(image, at: destination)
         let originIndexPath = IndexPath(row: origin, section: 0)
         let destinationIndexPath = IndexPath(row: destination, section: 0)
-        let isSelected = collectionView.indexPathsForSelectedItems?.contains(originIndexPath)
         
         UIView.performWithoutAnimation {
             self.collectionView.moveItem(at: originIndexPath, to: destinationIndexPath)
-            if isSelected ?? false {
-                collectionView.selectItem(at: destinationIndexPath, animated: false, scrollPosition: .centeredVertically)
+            if isActive {
+                collectionView.selectItem(at: destinationIndexPath,
+                                          animated: false,
+                                          scrollPosition: .centeredVertically)
             }
         }
     }
@@ -109,14 +110,14 @@ class ThumbnailViewController: UICollectionViewController {
         guard kind == UICollectionView.elementKindSectionFooter else {
             fatalError("unexpected view kind: \(kind)")
         }
-        guard let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind,
-                                                                           withReuseIdentifier: ThumbnailAddButtonFooter.reuseIdentifier, for: indexPath) as? ThumbnailAddButtonFooter else {
+        guard let view = collectionView.dequeueReusableSupplementaryView(ofKind: kind,
+                                                                           withReuseIdentifier: ThumbnailAddButtonView.reuseIdentifier, for: indexPath) as? ThumbnailAddButtonView else {
                                                                             fatalError("failed to dequeue")
         }
-        header.tapped = {
+        view.tapped = {
             self.thumbnailAddButtonTapped.send(true)
         }
-        return header
+        return view
     }
 
     // MARK: - UICollectionViewDelegate -
@@ -124,6 +125,5 @@ class ThumbnailViewController: UICollectionViewController {
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         activeThumbnailIndex = indexPath.row
     }
-
 
 }

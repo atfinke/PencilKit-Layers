@@ -15,9 +15,12 @@ extension CanvasViewController: PKCanvasViewDelegate {
     // MARK: - Interface Configuration -
     
     func configureCanvasView() {
-        canvasView.frame = view.bounds
+        canvasViewContainer.frame = view.bounds
+        view.addSubview(canvasViewContainer)
+        
+        canvasView.frame = canvasViewContainer.bounds
         canvasView.delegate = self
-        view.addSubview(canvasView)
+        canvasViewContainer.addSubview(canvasView)
     }
     
     func configureToolPicker() {

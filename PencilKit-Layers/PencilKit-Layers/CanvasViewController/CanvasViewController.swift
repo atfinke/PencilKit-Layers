@@ -15,6 +15,7 @@ class CanvasViewController: UIViewController {
     
     // MARK: - Interface Properties -
     
+    let canvasViewContainer = UIView()
     let canvasView: PKCanvasView = {
         let view = PKCanvasView()
         //        view.allowsFingerDrawing = false
@@ -99,17 +100,37 @@ class CanvasViewController: UIViewController {
         
         let thumbnailReordered = model.thumbnailReordered
             .receive(on: RunLoop.main)
-            .sink { origin, destination in
-                self.thumbnailViewController.reorderItem(at: origin, to: destination)
+            .sink { origin, destination, isActive in
+                self.thumbnailViewController.reorderItem(at: origin, to: destination, isActive: isActive)
         }
         
-        cancellables.append(contentsOf: [thumbnailUpdated, layerUpdated, thumbnailReordered])
+        let layerReordered = model.layerReordered
+            .receive(on: RunLoop.main)
+            .sink { origin, destination, isActive in
+                let layer = self.layers.remove(at: origin)
+                self.layers.insert(layer, at: destination)
+                if destination == 0 {
+                    self.canvasViewContainer.sendSubviewToBack(layer)
+                    if isActive {
+                        self.canvasViewContainer.sendSubviewToBack(self.canvasView)
+                    }
+                } else {
+                    self.canvasViewContainer.insertSubview(layer, belowSubview: self.layers[destination - 1])
+                    if isActive {
+                        self.canvasViewContainer.insertSubview(self.canvasView, belowSubview: self.layers[destination - 1])
+                    }
+                }
+                
+        }
+        
+        cancellables.append(contentsOf: [thumbnailUpdated, layerUpdated, thumbnailReordered, layerReordered])
     }
     
     private func created(snapshot: Model.LayerSnapshot, at index: Int) {
         os_log("%{public}s: index: %{public}d", log: .controller, type: .info, #function, index)
         let imageView = UIImageView()
-        imageView.backgroundColor = UIColor.yellow.withAlphaComponent(0.5)
+        imageView.isHidden = true
+        canvasViewContainer.addSubview(imageView)
         layers.insert(imageView, at: index)
     }
     
@@ -120,6 +141,9 @@ class CanvasViewController: UIViewController {
     
     private func updated(snapshot: Model.LayerSnapshot, at index: Int) {
         os_log("%{public}s: index: %{public}d", log: .controller, type: .info, #function, index)
+        let imageView = layers[index]
+        imageView.frame = snapshot.bounds.offsetBy(dx: 0, dy: view.safeAreaInsets.top)
+        imageView.image = snapshot.image
     }
     
     private func updated(thumbnail: UIImage, at index: Int) {
@@ -139,8 +163,13 @@ class CanvasViewController: UIViewController {
         thumbnailViewController.didMove(toParent: self)
         
         let thumbnailIndexTapped = thumbnailViewController.thumbnailIndexTapped.sink { index in
+            let currentIndex = self.model.activeDrawingIndex
+                
             self.model.selectLayer(at: index)
             self.canvasView.drawing = self.model.activeDrawing
+            self.canvasViewContainer.insertSubview(self.canvasView, belowSubview: self.layers[index])
+            self.layers[index].isHidden = true
+            self.layers[currentIndex].isHidden = false
         }
         let thumbnailAddButtonTapped = thumbnailViewController.thumbnailAddButtonTapped.sink { index in
             self.model.createLayer()

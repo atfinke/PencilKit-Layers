@@ -19,7 +19,7 @@
 		1434414D241411F00036D9AA /* OSLog+PencilKit-Layers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1434414C241411F00036D9AA /* OSLog+PencilKit-Layers.swift */; };
 		1434414F241417910036D9AA /* ThumbnailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1434414E241417910036D9AA /* ThumbnailViewController.swift */; };
 		1434415524141ACF0036D9AA /* ThumbnailCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1434415424141ACF0036D9AA /* ThumbnailCollectionViewCell.swift */; };
-		143441572414223E0036D9AA /* ThumbnailAddButtonFooter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 143441562414223E0036D9AA /* ThumbnailAddButtonFooter.swift */; };
+		143441572414223E0036D9AA /* ThumbnailAddButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 143441562414223E0036D9AA /* ThumbnailAddButtonView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -37,7 +37,7 @@
 		1434414C241411F00036D9AA /* OSLog+PencilKit-Layers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "OSLog+PencilKit-Layers.swift"; sourceTree = "<group>"; };
 		1434414E241417910036D9AA /* ThumbnailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThumbnailViewController.swift; sourceTree = "<group>"; };
 		1434415424141ACF0036D9AA /* ThumbnailCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThumbnailCollectionViewCell.swift; sourceTree = "<group>"; };
-		143441562414223E0036D9AA /* ThumbnailAddButtonFooter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThumbnailAddButtonFooter.swift; sourceTree = "<group>"; };
+		143441562414223E0036D9AA /* ThumbnailAddButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThumbnailAddButtonView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -86,7 +86,7 @@
 				1434414E241417910036D9AA /* ThumbnailViewController.swift */,
 				14012BB02414304600DE0D05 /* ThumbnailViewController+DND.swift */,
 				1434415424141ACF0036D9AA /* ThumbnailCollectionViewCell.swift */,
-				143441562414223E0036D9AA /* ThumbnailAddButtonFooter.swift */,
+				143441562414223E0036D9AA /* ThumbnailAddButtonView.swift */,
 			);
 			path = ThumbnailViewController;
 			sourceTree = "<group>";
@@ -192,7 +192,7 @@
 				14344147241409200036D9AA /* Design.swift in Sources */,
 				14344133241403BD0036D9AA /* AppDelegate.swift in Sources */,
 				14344135241403BD0036D9AA /* SceneDelegate.swift in Sources */,
-				143441572414223E0036D9AA /* ThumbnailAddButtonFooter.swift in Sources */,
+				143441572414223E0036D9AA /* ThumbnailAddButtonView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

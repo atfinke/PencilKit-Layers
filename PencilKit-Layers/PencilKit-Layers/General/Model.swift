@@ -34,6 +34,9 @@ class Model {
             fatalError("Tried to get drawing at index \(activeDrawingIndex), but only \(drawings.count) drawing(s)")
         }
     }
+    var drawingsCount: Int {
+        return drawings.count
+    }
     
     private(set) var drawings = [PKDrawing]()
     private(set) var drawingLayerSnapshots = [LayerSnapshot]()
@@ -50,8 +53,8 @@ class Model {
     let thumbnailUpdated = PassthroughSubject<(index: Int, thumbnail: UIImage), Never>()
     let layerUpdated = PassthroughSubject<(index: Int, snapshot: LayerSnapshot), Never>()
     
-    let thumbnailReordered = PassthroughSubject<(origin: Int, destination: Int), Never>()
-    let layerReordered = PassthroughSubject<(origin: Int, destination: Int), Never>()
+    let thumbnailReordered = PassthroughSubject<(origin: Int, destination: Int, isActive: Bool), Never>()
+    let layerReordered = PassthroughSubject<(origin: Int, destination: Int, isActive: Bool), Never>()
     
     // MARK: - Layer State -
     
@@ -61,7 +64,7 @@ class Model {
         let thumbnail = UIImage()
         let layer = LayerSnapshot(bounds: .zero, image: thumbnail)
         
-        let index = drawings.count
+        let index = drawingsCount   
         drawings.insert(PKDrawing(), at: index)
         drawingThumbnailSnapshots.insert(thumbnail, at: index)
         drawingLayerSnapshots.insert(layer, at: index)
@@ -71,7 +74,6 @@ class Model {
     }
     
     func selectLayer(at index: Int) {
-        generateLayerSnapshot()
         activeDrawingIndex = index
     }
     
@@ -85,8 +87,8 @@ class Model {
         drawingThumbnailSnapshots.insert(thumbnail, at: destination)
         drawingLayerSnapshots.insert(layer, at: destination)
         
-        thumbnailReordered.send((origin, destination))
-        layerReordered.send((origin, destination))
+        thumbnailReordered.send((origin, destination, isActive))
+        layerReordered.send((origin, destination, isActive))
         
         if isActive {
             activeDrawingIndex = destination
@@ -97,6 +99,7 @@ class Model {
         os_log("%{public}s: called", log: .model, type: .info, #function)
         drawings[activeDrawingIndex] = drawing
         generateThumbnailSnapshot()
+        generateLayerSnapshot()
     }
     
     // MARK: - Image Generation -
@@ -129,14 +132,15 @@ class Model {
         let drawing = activeDrawing
         let drawingIndex = activeDrawingIndex
         
-        let thumbnailCaptureSize = UIScreen.main.bounds
+        let captureSize = UIScreen.main.bounds
+        let scale = UIScreen.main.scale
         
-        canvasViewLayerRenderer.async {
+        canvasViewLayerRenderer.sync {
             let bounds = drawing.bounds
-            let image =  drawing.image(from: bounds, scale: UIScreen.main.scale)
+            let image =  drawing.image(from: bounds, scale: scale)
             let snapshot = LayerSnapshot(bounds: bounds, image: image)
             
-            os_log("%{public}s: size: %{public}s, scale: %{public}.2f", log: .model, type: .info, #function, thumbnailCaptureSize.debugDescription, scale)
+            os_log("%{public}s: size: %{public}s, scale: %{public}.2f", log: .model, type: .info, #function, captureSize.debugDescription, scale)
             
             self.drawingLayerSnapshots[drawingIndex] = snapshot
             self.layerUpdated.send((drawingIndex, snapshot))
