@@ -12,6 +12,8 @@
 		14344137241403BD0036D9AA /* CanvasViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14344136241403BD0036D9AA /* CanvasViewController.swift */; };
 		1434413C241403BE0036D9AA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1434413B241403BE0036D9AA /* Assets.xcassets */; };
 		1434413F241403BE0036D9AA /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1434413D241403BE0036D9AA /* LaunchScreen.storyboard */; };
+		14344147241409200036D9AA /* Design.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14344146241409200036D9AA /* Design.swift */; };
+		14344149241409580036D9AA /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14344148241409580036D9AA /* Model.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -22,6 +24,8 @@
 		1434413B241403BE0036D9AA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		1434413E241403BE0036D9AA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		14344140241403BE0036D9AA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		14344146241409200036D9AA /* Design.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Design.swift; sourceTree = "<group>"; };
+		14344148241409580036D9AA /* Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Model.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -57,6 +61,8 @@
 				14344132241403BD0036D9AA /* AppDelegate.swift */,
 				14344134241403BD0036D9AA /* SceneDelegate.swift */,
 				14344136241403BD0036D9AA /* CanvasViewController.swift */,
+				14344148241409580036D9AA /* Model.swift */,
+				14344146241409200036D9AA /* Design.swift */,
 				1434413B241403BE0036D9AA /* Assets.xcassets */,
 				1434413D241403BE0036D9AA /* LaunchScreen.storyboard */,
 				14344140241403BE0036D9AA /* Info.plist */,
@@ -134,7 +140,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				14344149241409580036D9AA /* Model.swift in Sources */,
 				14344137241403BD0036D9AA /* CanvasViewController.swift in Sources */,
+				14344147241409200036D9AA /* Design.swift in Sources */,
 				14344133241403BD0036D9AA /* AppDelegate.swift in Sources */,
 				14344135241403BD0036D9AA /* SceneDelegate.swift in Sources */,
 			);
