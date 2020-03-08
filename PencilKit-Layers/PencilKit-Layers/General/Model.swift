@@ -15,9 +15,22 @@ class Model {
     
     // MARK: - Types -
     
-    struct LayerSnapshot {
-        let bounds: CGRect
-        let image: UIImage
+    class Thumbnail {
+        var image: UIImage
+        var isVisible: Bool
+        
+        init(_ image: UIImage, isVisible: Bool) {
+            self.image = image
+            self.isVisible = isVisible
+        }
+    }
+    
+    enum ThumbnailUpdate {
+        case created(index: Int, thumbnail: Thumbnail), updated(index: Int, thumbnail: Thumbnail), reordered(origin: Int, destination: Int, isActive: Bool)
+    }
+    
+    enum LayerUpdate {
+        case created(index: Int), active(previous: Int?, new: Int), reordered(origin: Int, destination: Int)
     }
     
     // MARK: - Properties -
@@ -27,90 +40,91 @@ class Model {
             os_log("%{public}s: now: %{public}d", log: .model, type: .info, #function, activeDrawingIndex)
         }
     }
-    var activeDrawing: PKDrawing {
-        if activeDrawingIndex < drawings.count {
-            return drawings[activeDrawingIndex]
-        } else {
-            fatalError("Tried to get drawing at index \(activeDrawingIndex), but only \(drawings.count) drawing(s)")
-        }
-    }
-    var drawingsCount: Int {
-        return drawings.count
-    }
     
-    private(set) var drawings = [PKDrawing]()
-    private(set) var drawingLayerSnapshots = [LayerSnapshot]()
-    private(set) var drawingThumbnailSnapshots = [UIImage]()
+    private(set) var thumbnails = [Thumbnail]()
+    private let canvasViewThumbnailRenderer = DispatchQueue(label: "com.andrewfinke.layers.renderer", qos: .utility)
     
-    private let canvasViewLayerRenderer = DispatchQueue(label: "com.andrewfinke.layers.renderer.layer", qos: .userInitiated)
-    private let canvasViewThumbnailRenderer = DispatchQueue(label: "com.andrewfinke.layers.renderer.thumbnails", qos: .utility)
+    // MARK: - Publishers -
     
-    // MARK: - Closuers -
-    
-    let thumbnailCreated = PassthroughSubject<(index: Int, thumbnail: UIImage), Never>()
-    let layerCreated = PassthroughSubject<(index: Int, snapshot: LayerSnapshot), Never>()
-    
-    let thumbnailUpdated = PassthroughSubject<(index: Int, thumbnail: UIImage), Never>()
-    let layerUpdated = PassthroughSubject<(index: Int, snapshot: LayerSnapshot), Never>()
-    
-    let thumbnailReordered = PassthroughSubject<(origin: Int, destination: Int, isActive: Bool), Never>()
-    let layerReordered = PassthroughSubject<(origin: Int, destination: Int, isActive: Bool), Never>()
+    let thumbnailUpdate = PassthroughSubject<ThumbnailUpdate, Never>()
+    let layerUpdate = PassthroughSubject<LayerUpdate, Never>()
     
     // MARK: - Layer State -
     
     func createLayer() {
-        os_log("%{public}s: index: %{public}d", log: .model, type: .info, #function)
+        os_log("%{public}s: called", log: .model, type: .info, #function)
         
-        let thumbnail = UIImage()
-        let layer = LayerSnapshot(bounds: .zero, image: thumbnail)
-        
-        let index = drawingsCount   
-        drawings.insert(PKDrawing(), at: index)
-        drawingThumbnailSnapshots.insert(thumbnail, at: index)
-        drawingLayerSnapshots.insert(layer, at: index)
+        let index = thumbnails.count
+        let thumbnail = Thumbnail(UIImage(), isVisible: true)
+        thumbnails.insert(thumbnail, at: index)
 
-        thumbnailCreated.send((index, thumbnail))
-        layerCreated.send((index, layer))
+        layerUpdate.send(.created(index: index))
+        thumbnailUpdate.send(.created(index: index, thumbnail: thumbnail))
     }
     
     func selectLayer(at index: Int) {
+        os_log("%{public}s: index: %{public}d", log: .model, type: .info, #function, index)
+        let previous = activeDrawingIndex
         activeDrawingIndex = index
+        layerUpdate.send(.active(previous: previous, new: index))
     }
     
     func reorderItem(at origin: Int, to destination: Int) {
+        os_log("%{public}s: origin: %{public}d, origin: %{public}d", log: .model, type: .info, #function, origin, destination)
+        
         let isActive = origin == activeDrawingIndex
-        let drawing = drawings.remove(at: origin)
-        let thumbnail = drawingThumbnailSnapshots.remove(at: origin)
-        let layer = drawingLayerSnapshots.remove(at: origin)
-        
-        drawings.insert(drawing, at: destination)
-        drawingThumbnailSnapshots.insert(thumbnail, at: destination)
-        drawingLayerSnapshots.insert(layer, at: destination)
-        
-        thumbnailReordered.send((origin, destination, isActive))
-        layerReordered.send((origin, destination, isActive))
+        let thumbnail = thumbnails.remove(at: origin)
+
+        thumbnails.insert(thumbnail, at: destination)
+        thumbnailUpdate.send(.reordered(origin: origin, destination: destination, isActive: isActive))
+        layerUpdate.send(.reordered(origin: origin, destination: destination))
         
         if isActive {
             activeDrawingIndex = destination
+        } else if origin > activeDrawingIndex && destination <= activeDrawingIndex {
+            activeDrawingIndex += 1
+        } else if origin < activeDrawingIndex && destination >= activeDrawingIndex {
+            activeDrawingIndex -= 1
         }
+    }
+    
+    func deleteItem(at index: Int) {
+        os_log("%{public}s: index: %{public}d", log: .model, type: .info, #function, index)
+        assert(thumbnails.count > 1)
+        
+        thumbnails.remove(at: index)
+        thumbnailUpdate.send(.reordered(origin: index, destination: -1, isActive: false))
+        layerUpdate.send(.reordered(origin: index, destination: -1))
+
+        if activeDrawingIndex == index {
+            if index == 0 {
+                layerUpdate.send(.active(previous: nil, new: 0))
+            } else {
+                layerUpdate.send(.active(previous: nil, new: index - 1))
+            }
+        } else if activeDrawingIndex > index {
+            activeDrawingIndex -= 1
+        }
+    }
+    
+    func toggleItemVisiblity(at index: Int) {
+        os_log("%{public}s: index: %{public}d", log: .model, type: .info, #function, index)
+        thumbnails[index].isVisible.toggle()
+        thumbnailUpdate.send(.updated(index: index, thumbnail: thumbnails[index]))
     }
     
     func updated(drawing: PKDrawing) {
         os_log("%{public}s: called", log: .model, type: .info, #function)
-        drawings[activeDrawingIndex] = drawing
-        generateThumbnailSnapshot()
-        generateLayerSnapshot()
+        generateThumbnailSnapshot(drawing: drawing)
     }
     
     // MARK: - Image Generation -
     
-    private func generateThumbnailSnapshot() {
+    private func generateThumbnailSnapshot(drawing: PKDrawing) {
         os_log("%{public}s: called", log: .model, type: .info, #function)
         assert(Thread.isMainThread)
         
-        let drawing = activeDrawing
         let drawingIndex = activeDrawingIndex
-        
         let thumbnailCaptureSize = UIScreen.main.bounds
         let scale = Design.thumbnailWidth / thumbnailCaptureSize.width
         
@@ -119,31 +133,8 @@ class Model {
             
             os_log("%{public}s: size: %{public}s, scale: %{public}.2f", log: .model, type: .info, #function, thumbnailCaptureSize.debugDescription, scale)
             
-            self.drawingThumbnailSnapshots[drawingIndex] = image
-            self.thumbnailUpdated.send((drawingIndex, image))
-        }
-    }
-    
-    private func generateLayerSnapshot() {
-        os_log("%{public}s: called", log: .model, type: .info, #function)
-        
-        assert(Thread.isMainThread)
-        
-        let drawing = activeDrawing
-        let drawingIndex = activeDrawingIndex
-        
-        let captureSize = UIScreen.main.bounds
-        let scale = UIScreen.main.scale
-        
-        canvasViewLayerRenderer.sync {
-            let bounds = drawing.bounds
-            let image =  drawing.image(from: bounds, scale: scale)
-            let snapshot = LayerSnapshot(bounds: bounds, image: image)
-            
-            os_log("%{public}s: size: %{public}s, scale: %{public}.2f", log: .model, type: .info, #function, captureSize.debugDescription, scale)
-            
-            self.drawingLayerSnapshots[drawingIndex] = snapshot
-            self.layerUpdated.send((drawingIndex, snapshot))
+            self.thumbnails[drawingIndex].image = image
+            self.thumbnailUpdate.send(.updated(index: drawingIndex, thumbnail: self.thumbnails[drawingIndex]))
         }
     }
     

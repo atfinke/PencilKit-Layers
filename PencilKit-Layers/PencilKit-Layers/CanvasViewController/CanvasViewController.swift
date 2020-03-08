@@ -15,21 +15,15 @@ class CanvasViewController: UIViewController {
     
     // MARK: - Interface Properties -
     
-    let canvasViewContainer = UIView()
-    let canvasView: PKCanvasView = {
-        let view = PKCanvasView()
-        //        view.allowsFingerDrawing = false
-        
-        // Needed to have transparent canvas
-        view.backgroundColor = .clear
-        view.isOpaque = false
-        return view
+    let canvasViewsContainer = UIView()
+    private var layers = [PKCanvasView]()
+    private lazy var toolPicker: PKToolPicker = {
+        guard let window = view.window, let toolPicker = PKToolPicker.shared(for: window) else {
+            fatalError("Couldn't get window")
+        }
+        return toolPicker
     }()
     
-    var layers = [UIImageView]()
-    var cancellables = [AnyCancellable]()
-    
-    let model = Model()
     let thumbnailViewController: ThumbnailViewController = {
         let layout = UICollectionViewFlowLayout()
         layout.itemSize = Design.thumbnailSize
@@ -44,25 +38,25 @@ class CanvasViewController: UIViewController {
         return controller
     }()
     
+    
+    // MARK: - Other Properties -
+    
+    private var cancellables = [AnyCancellable]()
+    let model = Model()
+    
     // MARK: - View Life Cycle -
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         title = "PencilKit Layers Exploration"
-        configureCanvasView()
+        configureCanvasViewsContainer()
         configureThumbnailViewController()
         
         configureModelSubscribers()
         model.createLayer()
-        canvasView.drawing = model.activeDrawing
         
         configureNavigationItem()
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        configureToolPicker()
     }
     
     override var prefersHomeIndicatorAutoHidden: Bool {
@@ -72,85 +66,73 @@ class CanvasViewController: UIViewController {
     // MARK: - Model Listeners -
     
     private func configureModelSubscribers() {
-        let thumbnailCreated = model.thumbnailCreated
+        let thumbnailUpdate = model.thumbnailUpdate
             .receive(on: RunLoop.main)
-            .map { input -> (index: Int, thumbnail: UIImage) in
-                self.created(thumbnail: input.thumbnail, at: input.index)
-                return input
-        }
+            .sink(receiveValue: { update in
+                switch update {
+                case .created(let index, let thumbnail):
+                    self.created(thumbnail: thumbnail, at: index)
+                    self.updated(thumbnail: thumbnail, at: index)
+                case .updated(let index, let thumbnail):
+                    self.updated(thumbnail: thumbnail, at: index)
+                case .reordered(let origin, let destination, let isActive):
+                    self.thumbnailViewController.reorderItem(at: origin, to: destination, isActive: isActive)
+                }
+            })
         
-        let thumbnailUpdated = model.thumbnailUpdated
+        let layerUpdate = model.layerUpdate
             .receive(on: RunLoop.main)
-            .merge(with: thumbnailCreated)
-            .sink { index, thumbnail in
-                self.updated(thumbnail: thumbnail, at: index)
-        }
-        
-        let layerCreated = model.layerCreated
-            .receive(on: RunLoop.main)
-            .map { input -> (index: Int, snapshot: Model.LayerSnapshot) in
-                self.created(snapshot: input.snapshot, at: input.index)
-                return input
-        }
-        
-        let layerUpdated = model.layerUpdated
-            .receive(on: RunLoop.main)
-            .merge(with: layerCreated)
-            .sink { index, snapshot in
-                self.updated(snapshot: snapshot, at: index)
-        }
-        
-        let thumbnailReordered = model.thumbnailReordered
-            .receive(on: RunLoop.main)
-            .sink { origin, destination, isActive in
-                self.thumbnailViewController.reorderItem(at: origin, to: destination, isActive: isActive)
-        }
-        
-        let layerReordered = model.layerReordered
-            .receive(on: RunLoop.main)
-            .sink { origin, destination, isActive in
-                let layer = self.layers.remove(at: origin)
-                self.layers.insert(layer, at: destination)
-                if destination == 0 {
-                    self.canvasViewContainer.sendSubviewToBack(layer)
-                    if isActive {
-                        self.canvasViewContainer.sendSubviewToBack(self.canvasView)
+            .sink { action in
+                switch action {
+                case .created(let index):
+                    let layer = self.createNewLayer()
+                    
+                    self.layers.insert(layer, at: index)
+                    if self.layers.count == 1 {
+                        self.layers.first?.isUserInteractionEnabled = true
+                        self.layers.first?.becomeFirstResponder()
+                        self.canvasViewsContainer.addSubview(layer)
+                    } else if index == 0 {
+                        self.canvasViewsContainer.bringSubviewToFront(layer)
+                    } else {
+                        self.canvasViewsContainer.insertSubview(layer, belowSubview: self.layers[index - 1])
                     }
-                } else {
-                    self.canvasViewContainer.insertSubview(layer, belowSubview: self.layers[destination - 1])
-                    if isActive {
-                        self.canvasViewContainer.insertSubview(self.canvasView, belowSubview: self.layers[destination - 1])
+                case .active(let previous, let new):
+                    if let previous = previous {
+                        self.layers[previous].isUserInteractionEnabled = false
+                        self.layers[previous].resignFirstResponder()
+                    }
+                    self.layers[new].isUserInteractionEnabled = true
+                    self.layers[new].becomeFirstResponder()
+                case .reordered(let origin, let destination):
+                    if destination == -1 {
+                        self.layers[origin].removeFromSuperview()
+                        self.layers.remove(at: origin)
+                        return
+                    }
+                    
+                    let layer = self.layers.remove(at: origin)
+                    self.layers.insert(layer, at: destination)
+                    if destination == 0 {
+                        self.canvasViewsContainer.bringSubviewToFront(layer)
+                    } else {
+                        self.canvasViewsContainer.insertSubview(layer, belowSubview: self.layers[destination - 1])
                     }
                 }
-                
         }
         
-        cancellables.append(contentsOf: [thumbnailUpdated, layerUpdated, thumbnailReordered, layerReordered])
+        cancellables.append(contentsOf: [thumbnailUpdate, layerUpdate])
     }
     
-    private func created(snapshot: Model.LayerSnapshot, at index: Int) {
-        os_log("%{public}s: index: %{public}d", log: .controller, type: .info, #function, index)
-        let imageView = UIImageView()
-        imageView.isHidden = true
-        canvasViewContainer.addSubview(imageView)
-        layers.insert(imageView, at: index)
-    }
-    
-    private func created(thumbnail: UIImage, at index: Int) {
+    private func created(thumbnail: Model.Thumbnail, at index: Int) {
         os_log("%{public}s: index: %{public}d", log: .controller, type: .info, #function, index)
         thumbnailViewController.add(thumbnail: thumbnail, at: index)
     }
     
-    private func updated(snapshot: Model.LayerSnapshot, at index: Int) {
-        os_log("%{public}s: index: %{public}d", log: .controller, type: .info, #function, index)
-        let imageView = layers[index]
-        imageView.frame = snapshot.bounds.offsetBy(dx: 0, dy: view.safeAreaInsets.top)
-        imageView.image = snapshot.image
-    }
-    
-    private func updated(thumbnail: UIImage, at index: Int) {
+    private func updated(thumbnail: Model.Thumbnail, at index: Int) {
         os_log("%{public}s: index: %{public}d", log: .controller, type: .info, #function, index)
         thumbnailViewController.update(thumbnail: thumbnail, at: index)
+        layers[index].isHidden = !thumbnail.isVisible
     }
     
     // MARK: - Other -
@@ -163,24 +145,34 @@ class CanvasViewController: UIViewController {
         view.addSubview(thumbnailViewController.view)
         thumbnailViewController.didMove(toParent: self)
         
-        let thumbnailIndexTapped = thumbnailViewController.thumbnailIndexTapped.sink { index in
-            let currentIndex = self.model.activeDrawingIndex
-                
-            self.model.selectLayer(at: index)
-            self.canvasView.drawing = self.model.activeDrawing
-            self.canvasViewContainer.insertSubview(self.canvasView, belowSubview: self.layers[index])
-            self.layers[index].isHidden = true
-            self.layers[currentIndex].isHidden = false
+        let thumbnailAction = thumbnailViewController.thumbnailAction.sink { action in
+            switch action {
+            case .tapped(let index):
+                self.model.selectLayer(at: index)
+            case .deleted(let index):
+                self.model.deleteItem(at: index)
+            case .visiblity(let index):
+                self.model.toggleItemVisiblity(at: index)
+            case .reordered(let origin, let destination):
+                self.model.reorderItem(at: origin, to: destination)
+            case .added:
+                self.model.createLayer()
+            }
         }
-        let thumbnailAddButtonTapped = thumbnailViewController.thumbnailAddButtonTapped.sink { index in
-            self.model.createLayer()
-        }
-        let thumbnailReordered = thumbnailViewController.thumbnailReordered.sink { origin, destination in
-            self.model.reorderItem(at: origin, to: destination)
-        }
+        cancellables.append(thumbnailAction)
+    }
+    
+    func createNewLayer() -> PKCanvasView {
+        let canvasView = PKCanvasView(frame: canvasViewsContainer.bounds)
+        canvasView.isOpaque = false
+        canvasView.backgroundColor = .clear
+        canvasView.delegate = self
+        canvasView.isUserInteractionEnabled = false
+        canvasView.allowsFingerDrawing = false
+        toolPicker.setVisible(true, forFirstResponder: canvasView)
+        toolPicker.addObserver(canvasView)
         
-        cancellables.append(contentsOf: [thumbnailIndexTapped, thumbnailAddButtonTapped, thumbnailReordered])
+        return canvasView
     }
     
 }
-

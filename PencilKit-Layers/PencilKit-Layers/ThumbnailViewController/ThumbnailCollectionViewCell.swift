@@ -21,6 +21,21 @@ class ThumbnailCollectionViewCell: UICollectionViewCell {
         return view
     }()
     
+    let eyeImageViewContainer: UIView = {
+        let view = UIView()
+        view.backgroundColor = UIColor.quaternarySystemFill.withAlphaComponent(0.25)
+        view.isHidden = true
+        return view
+    }()
+    
+    private let eyeImageView: UIImageView = {
+        let view = UIImageView(frame: CGRect(origin: .zero, size: CGSize(width: 40, height: 40)))
+        view.contentMode = .scaleAspectFit
+        view.tintColor = UIColor.label
+        view.image = UIImage(systemName: "eye.slash.fill")
+        return view
+    }()
+    
     override var isSelected: Bool {
         didSet {
             setNeedsLayout()
@@ -34,6 +49,10 @@ class ThumbnailCollectionViewCell: UICollectionViewCell {
         super.init(frame: frame)
         clipsToBounds = true
         addSubview(imageView)
+        
+        eyeImageViewContainer.addSubview(eyeImageView)
+        addSubview(eyeImageViewContainer)
+        
         layer.borderColor = UIColor.clear.cgColor
     }
     
@@ -54,6 +73,9 @@ class ThumbnailCollectionViewCell: UICollectionViewCell {
         layer.borderColor = (isSelected ? tintColor : .clear)?.cgColor
         
         imageView.frame = bounds.insetBy(dx: borderWidth, dy: borderWidth)
+        
+        eyeImageViewContainer.frame = bounds
+        eyeImageView.center = eyeImageViewContainer.center
     }
 }
 

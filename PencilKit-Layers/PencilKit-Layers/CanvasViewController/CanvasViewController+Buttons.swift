@@ -24,9 +24,9 @@ extension CanvasViewController {
     @objc
     private func share(sender: UIBarButtonItem) {
         let format = UIGraphicsImageRendererFormat()
-        let renderer = UIGraphicsImageRenderer(bounds: canvasViewContainer.bounds, format: format)
+        let renderer = UIGraphicsImageRenderer(bounds: canvasViewsContainer.bounds, format: format)
         let image = renderer.image { _ in
-            canvasViewContainer.drawHierarchy(in: canvasViewContainer.bounds, afterScreenUpdates: true)
+            canvasViewsContainer.drawHierarchy(in: canvasViewsContainer.bounds, afterScreenUpdates: true)
         }
         
         let controller = UIActivityViewController(activityItems: [image], applicationActivities: nil)

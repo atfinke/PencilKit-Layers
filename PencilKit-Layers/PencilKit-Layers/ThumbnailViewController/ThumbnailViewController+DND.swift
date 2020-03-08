@@ -30,9 +30,9 @@ extension ThumbnailViewController: UICollectionViewDragDelegate, UICollectionVie
     func collectionView(_ collectionView: UICollectionView, performDropWith coordinator: UICollectionViewDropCoordinator) {
         guard let destination = coordinator.destinationIndexPath,
             let origin = coordinator.items.first?.sourceIndexPath else {
-                fatalError()
+                return
         }
-        thumbnailReordered.send((origin.row, destination.row))
+        thumbnailAction.send(.reordered(index: origin.row, destination: destination.row))
     }
     
 }
